@@ -1,12 +1,16 @@
 # encoding: UTF-8
-# autoload :YAML, "yaml"
-require "yaml"
+# require "yaml"
 
 class Anagram
-  attr_reader :words
-  def initialize(file)
-    @words = Anagram.build_wordlist(file)
-    @anagrams = Anagram.build_anagram(@words)
+  autoload :YAML, "yaml"
+  def initialize(file=nil)
+    @anagrams =
+      if file
+        @words = Anagram.build_wordlist(file)
+        Anagram.build_anagram(@words)
+      else
+        Anagram.load_anagram
+      end
   end
 
   def find(word)
@@ -14,28 +18,39 @@ class Anagram
     list ? list - [word] : []
   end
 
-  def self.build_wordlist(file)
-    file.map { |word| word.chomp.downcase }.uniq
+  def long_anagrams(size)
+    @anagrams.sort_by { |sign, word| -sign.size }.take(size).map(&:last)
   end
 
-  def self.build_anagram(words)
-    words.map { |word| [signize(word), word] }
-         .inject({}) { |h, (sign,word)| h[sign] ||= []; h[sign] << word; h }
-         .select { |sign, words| words.size > 1 }
-  end
+  class << self
+    def build_wordlist(file)
+      file.map { |word| word.chomp.downcase }.uniq.reject { |word| word.size < 2 }
+    end
 
-  def self.signize(word)
-    word.chars.sort.join.intern
-  end
+    def build_anagram(words)
+      words.map { |word| [signize(word), word] }
+           .inject({}) { |h, (sign,word)| h[sign] ||= []; h[sign] << word; h }
+           .select { |sign, words| words.size > 1 }
+    end
 
-  def self.build(file)
-    words = build_wordlist(file)
-    save(build_anagram words)
-  end
+    def signize(word)
+      word.chars.sort.join.intern
+    end
 
-  def self.save(anagrams)
-    path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
-    raise Errno::EEXIST, "Yaml file exist at #{path}" if File.exist?(path)
-    File.open(path, 'w') { |f| YAML.dump anagrams, f }
+    def build(file)
+      words = build_wordlist(file)
+      anagrams = build_anagram(words)
+      save(anagrams)
+    end
+
+    PATH = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
+    def save(anagrams)
+      raise Errno::EEXIST, "Yaml file exist at #{PATH}" if File.exist?(PATH)
+      File.open(PATH, 'w') { |f| YAML.dump anagrams, f }
+    end
+
+    def load_anagram
+      YAML.load_file(PATH)
+    end
   end
 end
