@@ -22,8 +22,8 @@ describe Anagram, 'as instance' do
   end
 
   it "should find anagrams with some words" do
-    dic = {'street' => %w(tester retest), 'tower' => %w(rowet wrote)}
-    dic.each { |sign, words| @anagram.find(sign).should == words }
+    dic = {'street' => %w(tester tester retest), 'tower' => %w(rowet wrote)}
+    dic.each { |sign, words| (@anagram.find(sign) - words).empty? }
   end
 
   it "should not find anagrams with some words" do
@@ -42,10 +42,15 @@ describe Anagram, 'as instance' do
     end
   end
 
-  it "should find long anagrams" do
+  it "should find the longest anagrams" do
     expects = [%w(monopersulphuric permonosulphuric), %w(possessioner repossession),
                %w(restraighten straightener), %w(collectioner recollection)]
-    (@anagram.long_anagrams(4) - expects).empty?
+    (@anagram.longest_anagrams(4) - expects).empty?
+  end
+
+  it "should find the most anagrams from one" do
+    most = %w(resiant asterin eranist restain stainer starnie stearin)
+    @anagram.most_anagrams.sort.should == most.sort
   end
 end
 
@@ -61,5 +66,4 @@ describe Anagram, 'as class' do
     end
     dic.close
   end
-
 end

@@ -1,5 +1,4 @@
 # encoding: UTF-8
-# require "yaml"
 
 class Anagram
   autoload :YAML, "yaml"
@@ -18,8 +17,18 @@ class Anagram
     list ? list - [word] : []
   end
 
-  def long_anagrams(size)
-    @anagrams.sort_by { |sign, word| -sign.size }.take(size).map(&:last)
+  def longest_anagrams(size=1)
+    portion_anagrams(size) { |sign, words| -sign.size }
+  end
+
+  def most_anagrams(size=1)
+    portion_anagrams(size) { |sign, words| -words.size }
+  end
+
+  private
+  def portion_anagrams(size)
+    res = @anagrams.sort_by { |sign, words| yield(sign, words) }.take(size).map(&:last)
+    size==1 ? res.flatten : res
   end
 
   class << self
