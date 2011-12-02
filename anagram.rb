@@ -13,8 +13,12 @@ class Anagram
   end
 
   def find(word)
-    list = @anagrams[Anagram.signize(word.downcase)]
+    list = @anagrams[Anagram.signature(word.downcase)]
     list ? list - [word] : []
+  end
+
+  def all_anagrams
+    @anagrams.values
   end
 
   def longest_anagrams(size=1)
@@ -32,21 +36,26 @@ class Anagram
   end
 
   class << self
+    def find(word)
+      self.new.find(word)
+    end
+    
     def build_wordlist(file)
       file.map { |word| word.chomp.downcase }.uniq.reject { |word| word.size < 2 }
     end
 
     def build_anagram(words)
-      words.map { |word| [signize(word), word] }
+      words.map { |word| [signature(word), word] }
            .inject({}) { |h, (sign,word)| h[sign] ||= []; h[sign] << word; h }
            .select { |sign, words| words.size > 1 }
     end
 
-    def signize(word)
+    def signature(word)
       word.chars.sort.join.intern
     end
 
     def build(file)
+      file_exist_error(PATH)
       words = build_wordlist(file)
       anagrams = build_anagram(words)
       save(anagrams)
@@ -54,12 +63,16 @@ class Anagram
 
     PATH = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
     def save(anagrams)
-      raise Errno::EEXIST, "Yaml file exist at #{PATH}" if File.exist?(PATH)
+      file_exist_error(PATH)
       File.open(PATH, 'w') { |f| YAML.dump anagrams, f }
     end
 
     def load_anagram
       YAML.load_file(PATH)
+    end
+    
+    def file_exist_error(path)
+      raise Errno::EEXIST, "Yaml file exist at #{path}" if File.exist?(path)
     end
   end
 end
