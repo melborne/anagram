@@ -5,6 +5,7 @@ describe Anagram, 'as instance' do
   before(:all) do
     @dic = File.open('./sample_dic')
     @anagram = Anagram.new(@dic)
+    @yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
   end
 
   after(:all) do
@@ -32,11 +33,10 @@ describe Anagram, 'as instance' do
   end
 
   it "should use yaml file at instantiate without arguments" do
-    yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
-    if File.exist?(yaml_path)
+    if File.exist?(@yaml_path)
       anagram = Anagram.new
-      dic = {'street' => %w(tester retest), 'tower' => %w(rowet wrote)}
-      dic.each { |sign, words| anagram.find(sign).should == words }
+      dic = {'street' => %w(tester retest setter), 'tower' => %w(rowet wrote)}
+      dic.each { |sign, words| (anagram.find(sign) - words).empty? }
     else
       ->{ Anagram.new }.should raise_error(Errno::ENOENT)
     end
@@ -52,6 +52,10 @@ describe Anagram, 'as instance' do
     most = %w(resiant asterin eranist restain stainer starnie stearin)
     @anagram.most_anagrams.sort.should == most.sort
   end
+
+  it "should find all anagrams" do
+    @anagram.all_anagrams.size.should == 7
+  end
 end
 
 describe Anagram, 'as class' do
@@ -65,5 +69,11 @@ describe Anagram, 'as class' do
       file.path.should == yaml_path
     end
     dic.close
+  end
+
+  it "should find anagrams with some words" do
+    anagram = Anagram.new(open './sample_dic')
+    dic = {'street' => %w(tester tester retest), 'tower' => %w(rowet wrote)}
+    dic.each { |sign, words| (anagram.find(sign) - words).empty? }
   end
 end
