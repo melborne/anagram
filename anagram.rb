@@ -13,7 +13,7 @@ class Anagram
   end
 
   def find(word)
-    list = @anagrams[Anagram.signature(word.downcase)]
+    list = @anagrams[Anagram.signature(word)]
     list ? list - [word] : []
   end
 
@@ -58,7 +58,7 @@ class Anagram
     end
 
     def signature(word)
-      word.scan(/\p{Alnum}/).map(&:downcase).sort.join.intern
+      word.downcase.scan(/\p{Alnum}/).sort.join.intern
     end
 
     def build(file)
