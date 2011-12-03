@@ -3,4 +3,11 @@ require_relative "anagram"
 
 raise 'need at least one word!' unless ARGV[0]
 
-ARGV.each { |word| puts "#{word} => #{Anagram.find(word)}" }
+def anagram
+  ARGV.each { |word| puts "#{word} => #{Anagram.find(word)}" }
+rescue
+  STDERR.puts "build Anagram Dictionary with Anagram.build"
+  exit()
+end
+
+anagram
