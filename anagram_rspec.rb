@@ -50,47 +50,54 @@ describe Anagram, 'as instance' do
     end
   end
 
-  it "should be error at instantiation without arguments when a yaml file note exist" do
-    unless File.exist?(@yaml_path)
-      ->{ Anagram.new }.should raise_error(Errno::ENOENT)
+  context "initialize" do
+    it "should be error without arguments when a yaml file note exist" do
+      unless File.exist?(@yaml_path)
+        ->{ Anagram.new }.should raise_error(Errno::ENOENT)
+      end
     end
   end
 
-  it "should find the last 4 longest anagrams" do
-    expects = [%w(monopersulphuric permonosulphuric), %w(possessioner repossession),
-               %w(restraighten straightener), %w(collectioner recollection)]
-    (@anagram.longest_anagrams(4) - expects).empty?
-  end
+  context "Sampler" do
+    it "should take all anagrams" do
+      @anagram.all_anagrams.size.should == 9
+    end
 
-  it "should find the most anagrams from one" do
-    most = %w(resiant asterin eranist restain stainer starnie stearin)
-    @anagram.most_anagrams.sort.should == most.sort
-  end
+    it "should find the last 4 longest anagrams" do
+      expects = [%w(monopersulphuric permonosulphuric), %w(possessioner repossession),
+                 %w(restraighten straightener), %w(collectioner recollection)]
+      (@anagram.longest_anagrams(4) - expects).empty?
+    end
 
-  it "should take all anagrams" do
-    @anagram.all_anagrams.size.should == 9
+    it "should find the most anagrams from one" do
+      most = %w(resiant asterin eranist restain stainer starnie stearin)
+      @anagram.most_anagrams.sort.should == most.sort
+    end
   end
 end
 
 describe Anagram, 'as class' do
   context "build class method" do
+    before(:all) do
+      @dic = File.open('./sample_dic')
+      @yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
+    end
+
+    after(:all) do
+      @dic.close
+    end
+
     it "should build and save anagrams to a yaml file if it doesnt exist" do
-      dic = File.open('./sample_dic')
-      yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
-      unless File.exist?(yaml_path)
-        file = Anagram.build(dic)
+      unless File.exist?(@yaml_path)
+        file = Anagram.build(@dic)
         file.path.should == yaml_path
       end
-      dic.close
     end
 
     it "should be error when building anagrams if the yaml file exist" do
-      dic = File.open('./sample_dic')
-      yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
-      if File.exist?(yaml_path)
-        ->{ Anagram.build(dic) }.should raise_error(Errno::EEXIST)
+      if File.exist?(@yaml_path)
+        ->{ Anagram.build(@dic) }.should raise_error(Errno::EEXIST)
       end
-      dic.close
     end    
   end
 
@@ -119,7 +126,7 @@ describe Anagram, 'as class' do
       Anagram.anagrams?(sentence1, sentence2).should == true
     end
 
-    it "should be true with unicode words" do
+    it "should be true with Japanese words" do
       dic = [%w(いきるいみなんて みんないきている), %w(どらえもん もえらんど), %w(ぜいたくはてきだ てきはいただくぜ)]
       dic.each { |words| Anagram.anagrams?(*words).should == true }
     end
