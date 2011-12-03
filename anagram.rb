@@ -39,6 +39,13 @@ class Anagram
     def find(word)
       self.new.find(word)
     end
+
+    def anagrams?(*words)
+      raise ArgumentError, "at least 2 arguments" unless words.size > 1
+      signs = words.map { |word| signature word }
+      raise ArgumentError, "word must consist of 2 or more chars" unless signs.all?{ |w| w.size > 1 }
+      signs.uniq.size == 1
+    end
     
     def build_wordlist(file)
       file.map { |word| word.chomp.downcase }.uniq.reject { |word| word.size < 2 }
@@ -51,7 +58,7 @@ class Anagram
     end
 
     def signature(word)
-      word.chars.sort.join.intern
+      word.scan(/\p{Alnum}/).map(&:downcase).sort.join.intern
     end
 
     def build(file)
