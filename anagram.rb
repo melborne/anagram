@@ -17,15 +17,15 @@ class Anagram
     list ? list - [word] : []
   end
 
-  def all_anagrams
+  def all
     @anagrams.values
   end
 
-  def longest_anagrams(size=1)
+  def longest(size=1)
     portion_anagrams(size) { |sign, words| -sign.size }
   end
 
-  def most_anagrams(size=1)
+  def most(size=1)
     portion_anagrams(size) { |sign, words| -words.size }
   end
 

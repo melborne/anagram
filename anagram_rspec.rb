@@ -60,18 +60,18 @@ describe Anagram, 'as instance' do
 
   context "Sampler" do
     it "should take all anagrams" do
-      @anagram.all_anagrams.size.should == 9
+      @anagram.all.size.should == 14
     end
 
     it "should find the last 4 longest anagrams" do
       expects = [%w(monopersulphuric permonosulphuric), %w(possessioner repossession),
                  %w(restraighten straightener), %w(collectioner recollection)]
-      (@anagram.longest_anagrams(4) - expects).empty?
+      (@anagram.longest(4) - expects).empty?
     end
 
     it "should find the most anagrams from one" do
       most = %w(resiant asterin eranist restain stainer starnie stearin)
-      @anagram.most_anagrams.sort.should == most.sort
+      @anagram.most.sort.should == most.sort
     end
   end
 end
