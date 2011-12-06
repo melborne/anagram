@@ -56,6 +56,7 @@ class Anagram
     def build_anagram(words)
       words.map { |word| [signature(word), word] }
            .inject({}) { |h, (sign,word)| h[sign] ||= []; h[sign] << word; h }
+           .select { |k,v| v.size > 1 }
     end
 
     def signature(word)

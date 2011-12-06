@@ -60,7 +60,7 @@ describe Anagram, 'as instance' do
 
   context "Sampler" do
     it "should take all anagrams" do
-      @anagram.all.size.should == 14
+      @anagram.all.size.should == 9
     end
 
     it "should find the last 4 longest anagrams" do
