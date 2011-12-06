@@ -12,6 +12,8 @@ class Anagram
       end
   end
 
+  attr_reader :anagrams
+
   def find(word)
     list = @anagrams[Anagram.signature(word)]
     list ? list - [word] : []
