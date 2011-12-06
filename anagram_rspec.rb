@@ -66,12 +66,22 @@ describe Anagram, 'as instance' do
     it "should find the last 4 longest anagrams" do
       expects = [%w(monopersulphuric permonosulphuric), %w(possessioner repossession),
                  %w(restraighten straightener), %w(collectioner recollection)]
-      (@anagram.longest(4) - expects).empty?
+      (@anagram.longest(:size => 4) - expects).empty?
+    end
+
+    it "should find the longest anagram with its signature" do
+      expect = [:cehilmnoopprrsuu, %w(monopersulphuric permonosulphuric)]
+      @anagram.longest(:sign => true).should == expect
     end
 
     it "should find the most anagrams from one" do
-      most = %w(resiant asterin eranist restain stainer starnie stearin)
-      @anagram.most.sort.should == most.sort
+      expect = %w(resiant asterin eranist restain stainer starnie stearin)
+      @anagram.most.sort.should == expect.sort
+    end
+
+    it "should find the most anagrams with its signature" do
+      expect = [:aeinrst, %w(resiant asterin eranist restain stainer starnie stearin)]
+      @anagram.most(:sign => true).should == expect
     end
   end
 end

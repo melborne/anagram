@@ -23,18 +23,20 @@ class Anagram
     @anagrams.values
   end
 
-  def longest(size=1)
-    portion_anagrams(size) { |sign, words| -sign.size }
+  def longest(opt={})
+    portion_anagrams(opt) { |sign, words| -sign.size }
   end
 
-  def most(size=1)
-    portion_anagrams(size) { |sign, words| -words.size }
+  def most(opt={})
+    portion_anagrams(opt) { |sign, words| -words.size }
   end
 
   private
-  def portion_anagrams(size)
-    res = @anagrams.sort_by { |sign, words| yield(sign, words) }.take(size).map(&:last)
-    size==1 ? res.flatten : res
+  def portion_anagrams(opt)
+    opt = {:size => 1, :sign => false}.merge(opt)
+    res = @anagrams.sort_by { |sign, words| yield(sign, words) }.take(opt[:size])
+    res = opt[:sign] ? res : res.map(&:last)
+    opt[:size]==1 ? res.flatten(1) : res
   end
 
   class << self
