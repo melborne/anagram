@@ -1,12 +1,13 @@
 # encoding: UTF-8
 require "rspec"
-require "./anagram"
+require "./lib/anagram"
 
+SAMPLE_PATH = './spec/sample_dic'
+YAML_PATH = './lib/anagram.yml'
 describe Anagram, 'as instance' do
   before(:all) do
-    @dic = File.open('./sample_dic')
+    @dic = File.open(SAMPLE_PATH)
     @anagram = Anagram.new(@dic)
-    @yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
   end
 
   after(:all) do
@@ -37,7 +38,7 @@ describe Anagram, 'as instance' do
     end
 
     it "should use the anagram file if any at instantiation without arguments" do
-      if File.exist?(@yaml_path)
+      if File.exist?(YAML_PATH)
         anagram = Anagram.new
         dic = {'street' => %w(tester retest setter), 'tower' => %w(rowet wrote)}
         dic.each { |sign, words| (anagram.find(sign) - words).empty? }
@@ -52,7 +53,7 @@ describe Anagram, 'as instance' do
 
   context "initialize" do
     it "should be error without arguments when a yaml file note exist" do
-      unless File.exist?(@yaml_path)
+      unless File.exist?(YAML_PATH)
         ->{ Anagram.new }.should raise_error(Errno::ENOENT)
       end
     end
@@ -89,8 +90,7 @@ end
 describe Anagram, 'as class' do
   context "build class method" do
     before(:all) do
-      @dic = File.open('./sample_dic')
-      @yaml_path = File.expand_path(File.dirname __FILE__) + '/anagram.yml'
+      @dic = File.open(SAMPLE_PATH)
     end
 
     after(:all) do
@@ -98,14 +98,14 @@ describe Anagram, 'as class' do
     end
 
     it "should build and save anagrams to a yaml file if it doesnt exist" do
-      unless File.exist?(@yaml_path)
+      unless File.exist?(YAML_PATH)
         file = Anagram.build(@dic)
-        file.path.should == yaml_path
+        file.path.should == YAML_PATH
       end
     end
 
     it "should be error when building anagrams if the yaml file exist" do
-      if File.exist?(@yaml_path)
+      if File.exist?(YAML_PATH)
         ->{ Anagram.build(@dic) }.should raise_error(Errno::EEXIST)
       end
     end    
@@ -113,7 +113,7 @@ describe Anagram, 'as class' do
 
   context "find class method" do
     it "should find anagrams with words 'street', 'tower'" do
-      anagram = Anagram.new(open './sample_dic')
+      anagram = Anagram.new(open SAMPLE_PATH)
       dic = {'street' => %w(tester setter retest), 'tower' => %w(rowet wrote)}
       dic.each { |sign, words| (anagram.find(sign) - words).empty? }
     end    
