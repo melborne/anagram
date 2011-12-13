@@ -66,7 +66,7 @@ class Anagram
     end
 
     def build(file)
-      file_exist_error(PATH)
+      file_exist_error(PATH) # tell error before builds
       words = build_wordlist(file)
       anagrams = build_anagram(words)
       save(anagrams)
